@@ -5,9 +5,9 @@ from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from cookbook_api.models import Recipe, Ingredient
-from cookbook_api.serializers.recipe import RecipeSerializer
-from cookbook_api.service.recipe import filter_recipes
+from api.models import Recipe, Ingredient
+from api.serializers.recipe import RecipeSerializer
+from api.service.recipe import filter_recipes
 
 
 class RecipeListView(APIView):

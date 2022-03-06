@@ -42,8 +42,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
 
-    # Cookbook application
-    'cookbook_api.apps.CookbookConfig'
+    # api application
+    'api.apps.CookbookConfig'
 ]
 
 MIDDLEWARE = [

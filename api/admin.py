@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from cookbook_api.models import Account, Recipe, Ingredient
+from api.models import Account, Direction, Ingredient, Recipe
 
 
 class IngredientInlineAdmin(admin.TabularInline):
@@ -8,9 +8,14 @@ class IngredientInlineAdmin(admin.TabularInline):
     extra = 1
 
 
+class DirectionInlineAdmin(admin.TabularInline):
+    model = Direction
+    extra = 1
+
+
 class RecipeAdmin(admin.ModelAdmin):
     model = Recipe
-    inlines = (IngredientInlineAdmin, )
+    inlines = (IngredientInlineAdmin, DirectionInlineAdmin)
     readonly_fields = ('likes', 'dislikes')
 
 
