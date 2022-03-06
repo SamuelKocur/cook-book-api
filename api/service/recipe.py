@@ -1,4 +1,4 @@
-from cookbook_api.models import Recipe
+from api.models import Recipe
 
 
 def filter_recipes(content):

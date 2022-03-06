@@ -3,5 +3,5 @@ from django.urls import include, path
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('cookbook/api/', include('cookbook_api.urls'))
+    path('cookbook/api/', include('api.urls'))
 ]

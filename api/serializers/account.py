@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 # from django.contrib.auth.password_validation import validate_password
 
-from cookbook_api.models import Account
+from api.models import Account
 
 
 class RegisterSerializer(serializers.ModelSerializer):

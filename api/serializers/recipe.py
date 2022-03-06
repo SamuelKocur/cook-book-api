@@ -1,12 +1,13 @@
 from rest_framework import serializers
 
-from cookbook_api.models import Ingredient, Recipe
+from api.models import Direction, Ingredient, Recipe
 
 
-class IngredientListSerializer(serializers.ListSerializer):
+class ModelListSerializer(serializers.ListSerializer):
 
     def update(self, instance, validated_data, **kwargs):
-        ingredient_mapping = {ingredient.id: ingredient for ingredient in instance}
+        model_mapping = {model.id: model for model in instance}
+
         invalid_id = -1
         data_mapping = {}
         for item in validated_data:
@@ -18,18 +19,18 @@ class IngredientListSerializer(serializers.ListSerializer):
 
         # Perform creations and updates.
         ret = []
-        i = 0
-        for ingredient_id, data in data_mapping.items():
-            ingredient = ingredient_mapping.get(ingredient_id, None)
-            if ingredient is None:
+        for model_id, data in data_mapping.items():
+            model = model_mapping.get(model_id, None)
+            if model is None:
                 ret.append(self.child.create(data, **kwargs))
             else:
-                ret.append(self.child.update(ingredient, data))
+                ret.append(self.child.update(model, data))
 
         # Perform deletions.
-        for ingredient_id, ingredient in ingredient_mapping.items():
-            if ingredient_id not in data_mapping:
-                ingredient.delete()
+        for model_id, model in model_mapping.items():
+            if model_id not in data_mapping:
+                model.delete()
+
         return ret
 
 
@@ -38,7 +39,7 @@ class IngredientSerializer(serializers.ModelSerializer):
     note = serializers.CharField(required=False, allow_blank=True)
 
     class Meta:
-        list_serializer_class = IngredientListSerializer
+        list_serializer_class = ModelListSerializer
         model = Ingredient
         fields = (
             'id',
@@ -52,8 +53,22 @@ class IngredientSerializer(serializers.ModelSerializer):
         return Ingredient.objects.create(recipe=kwargs.get('recipe'), **validated_data)
 
 
+class DirectionSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(required=False)
+    order = serializers.IntegerField(required=False)
+
+    class Meta:
+        list_serializer_class = ModelListSerializer
+        model = Direction
+        fields = ('id', 'order', 'direction')
+
+    def create(self, validated_data, **kwargs):
+        return Direction.objects.create(recipe=kwargs.get('recipe'), **validated_data)
+
+
 class RecipeSerializer(serializers.ModelSerializer):
     ingredients = IngredientSerializer(many=True)
+    directions = DirectionSerializer(many=True)
 
     class Meta:
         model = Recipe
@@ -61,19 +76,28 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         ingredients_data = validated_data.pop('ingredients')
+        directions_data = validated_data.pop('directions')
+
         recipe = Recipe.objects.create(**validated_data)
+
         for ingredient_data in ingredients_data:
             Ingredient.objects.create(recipe=recipe, **ingredient_data)
+
+        for direction_data in directions_data:
+            Direction.objects.create(recipe=recipe, **direction_data)
+
         return recipe
 
     def update(self, instance, validated_data):
+        kwargs = {'recipe': instance}
+
         if 'ingredients' in validated_data:
             nested_serializer = self.fields['ingredients']
-            nested_instance = instance.ingredients.all()
-            nested_data = validated_data.pop('ingredients')
+            nested_serializer.update(instance.ingredients.all(), validated_data.pop('ingredients'), **kwargs)
 
-            kwargs = {'recipe': instance}
-            nested_serializer.update(nested_instance, nested_data, **kwargs)
+        if 'directions' in validated_data:
+            nested_serializer = self.fields['directions']
+            nested_serializer.update(instance.directions.all(), validated_data.pop('directions'), **kwargs)
 
         return super(RecipeSerializer, self).update(instance, validated_data)
 

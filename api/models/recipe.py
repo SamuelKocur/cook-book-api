@@ -11,9 +11,16 @@ class Ingredient(models.Model):
     note = models.TextField(blank=True)
 
 
+class Direction(models.Model):
+    recipe = models.ForeignKey(
+        "Recipe", on_delete=models.CASCADE, related_name="directions"
+    )
+    order = models.IntegerField(null=True, blank=True)
+    direction = models.TextField()
+
+
 class Recipe(models.Model):
     title = models.CharField(max_length=128)
-    directions = models.TextField()
     account = models.ForeignKey(
         "Account", on_delete=models.CASCADE, related_name="recipes", null=True, blank=True
     )
