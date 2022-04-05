@@ -23,20 +23,21 @@ class SignInView(APIView):
     """
     Authenticate user
     """
-    def get(self, request):
+    def post(self, request):
         data = {
-            'username': str(request.data['username']),
+            'email': str(request.data['email']),
             'password': str(request.data['password']),
         }
 
         try:
-            account = Account.objects.get(username=data['username'])
+            account = Account.objects.get(email=data['email'])
         except Account.DoesNotExist:
-            content = {'invalid username'}
-            return Response(content, status=status.HTTP_400_BAD_REQUEST)
+            content = {"error": "Invalid email"}
+            return Response(content, status.HTTP_400_BAD_REQUEST)
 
         if account.password == data['password']:
-            return Response(status=status.HTTP_200_OK)
+            content = {"id": account.id, "email": account.email}
+            return Response(content, status.HTTP_200_OK)
 
-        content = {'bad password'}
+        content = {"error": "Password is incorrect"}
         return Response(content, status.HTTP_401_UNAUTHORIZED)

@@ -33,3 +33,14 @@ class Recipe(models.Model):
     likes = models.IntegerField(default=0, blank=True, editable=False)
     dislikes = models.IntegerField(default=0, blank=True, editable=False)
     date_created = models.DateTimeField(auto_now_add=True, editable=False)
+
+
+# for now, it is not editable
+class Comment(models.Model):
+    account = models.ForeignKey("Account", on_delete=models.CASCADE, related_name="comments")
+    recipe = models.ForeignKey("Recipe", on_delete=models.CASCADE, related_name="comments")
+    text = models.TextField(editable=False)
+
+    likes = models.IntegerField(default=0, blank=True, editable=False)
+    dislikes = models.IntegerField(default=0, blank=True, editable=False)
+    date_created = models.DateTimeField(auto_now_add=True, editable=False)

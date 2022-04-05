@@ -69,3 +69,11 @@ class RecipeFilterListView(APIView):
         recipes = filter_recipes(body)
         serializer = RecipeSerializer(recipes, many=True)
         return Response(serializer.data)
+
+
+class CommentRecipeView(APIView):
+    pass
+
+
+class LikeRecipeView(APIView):
+    pass
