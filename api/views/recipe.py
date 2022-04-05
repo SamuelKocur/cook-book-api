@@ -14,6 +14,7 @@ class RecipeListView(APIView):
     """
     List recent snippets or create new recipe
     """
+
     def get(self, request):
         recipes = Recipe.objects.order_by('date_created', 'likes')
         serializer = RecipeSerializer(recipes, many=True)
@@ -31,6 +32,7 @@ class RecipeDetailView(APIView):
     """
     Retrieve, update or delete recipe
     """
+
     def get(self, request, recipe_id):
         recipe = get_object_or_404(Recipe, pk=recipe_id)
         serializer = RecipeSerializer(recipe)
@@ -54,6 +56,7 @@ class FavoriteRecipeListView(APIView):
     """
     Retrieve account' favorite recipes
     """
+
     def get(self, request, account_id):
         pass
 
@@ -62,6 +65,7 @@ class RecipeFilterListView(APIView):
     """
     Retrieve filtered recipe - by category, by ingredients
     """
+
     def get(self, request):
         body_unicode = request.body.decode('utf-8')
         body = json.loads(body_unicode)

@@ -100,5 +100,3 @@ class RecipeSerializer(serializers.ModelSerializer):
             nested_serializer.update(instance.directions.all(), validated_data.pop('directions'), **kwargs)
 
         return super(RecipeSerializer, self).update(instance, validated_data)
-
-

@@ -20,15 +20,35 @@ class Direction(models.Model):
 
 
 class Recipe(models.Model):
+
+    class Category(models.TextChoices):
+        MAIN_COURSE = 'main course'
+        SIDE_DISH = 'side dish'
+        DESSERT = 'desert'
+        APPETIZER = 'appetizer'
+        SALAD = 'salad'
+        BREAKFAST = 'breakfast'
+        SOUP = 'soup'
+        SNACK = 'snack'
+        BEVERAGE = 'beverage'
+
+    class Difficulty(models.TextChoices):
+        EASY = 'easy'
+        MODERATE = 'moderate'
+        HARD = 'hard'
+
     title = models.CharField(max_length=128)
     account = models.ForeignKey(
         "Account", on_delete=models.CASCADE, related_name="recipes", null=True, blank=True
     )
-    category = models.CharField(null=True, blank=True, max_length=32)
+    image = models.ImageField(upload_to='recipes/images')
+    category = models.CharField(max_length=20, choices=Category.choices, null=True)
+    description = models.TextField()
 
     prep_time = models.IntegerField(null=True, blank=True)
     cook_time = models.IntegerField(null=True, blank=True)
     servings = models.IntegerField(null=True, blank=True)
+    difficulty = models.CharField(max_length=10, choices=Difficulty.choices, null=True)
 
     likes = models.IntegerField(default=0, blank=True, editable=False)
     dislikes = models.IntegerField(default=0, blank=True, editable=False)
