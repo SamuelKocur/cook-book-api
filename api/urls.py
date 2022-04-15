@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import account, recipe, favorite_recipe, shopping_list
+from .views import account, recipe, favorite_recipe, shopping_list, recipe_review
 
 urlpatterns = [
     path('signup/', account.SignUpView.as_view(), name="sign_up"),
@@ -13,4 +13,6 @@ urlpatterns = [
 
     path('shoppinglist/', shopping_list.ShoppingListView.as_view(), name="user_shopping_list"),
     path('shoppinglist/user-item/', shopping_list.ShoppingListUserItemView.as_view(), name="user_own_shopping_list"),
+
+    path('recipes/review/', recipe_review.RecipeReviewView.as_view(), name="add_remove_review")
 ]

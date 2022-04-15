@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from api.models import Account, Instruction, AccountFavoriteRecipe, Ingredient, Recipe, ShoppingListItem
+from api.models import Account, Instruction, AccountFavoriteRecipe, Ingredient, Recipe, ShoppingListItem, Review
 
 
 class IngredientInlineAdmin(admin.TabularInline):
@@ -22,5 +22,6 @@ class RecipeAdmin(admin.ModelAdmin):
 admin.site.register(Account)
 admin.site.register(Recipe, RecipeAdmin)
 admin.site.register(Ingredient)
+admin.site.register(Review)
 admin.site.register(AccountFavoriteRecipe)
 admin.site.register(ShoppingListItem)

@@ -75,7 +75,7 @@ class Recipe(models.Model):
     gluten_free = models.BooleanField(default=False)
     lacto_free = models.BooleanField(default=False)
 
-    score = models.IntegerField(default=0, blank=True)
+    score = models.FloatField(default=0, blank=True)
     voted = models.IntegerField(default=0, blank=True)
 
     likes = models.IntegerField(default=0, blank=True, editable=False)
@@ -119,12 +119,15 @@ class Recipe(models.Model):
 class Review(models.Model):
     account = models.ForeignKey("Account", on_delete=models.CASCADE, related_name="reviews")
     recipe = models.ForeignKey("Recipe", on_delete=models.CASCADE, related_name="reviews")
-    rating = models.IntegerField(default=0)
-    text = models.TextField(editable=False)
+    rating = models.FloatField(default=0)
+    text = models.TextField()
 
     likes = models.IntegerField(default=0, blank=True, editable=False)
     dislikes = models.IntegerField(default=0, blank=True, editable=False)
     date_created = models.DateTimeField(auto_now_add=True, editable=False)
+
+    class Meta:
+        ordering = ['-date_created']
 
 
 class AccountFavoriteRecipe(models.Model):

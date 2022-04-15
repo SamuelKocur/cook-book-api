@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from api.models import Instruction, Ingredient, Recipe, AccountFavoriteRecipe, ShoppingListItem
+from api.models import Instruction, Ingredient, Recipe, AccountFavoriteRecipe, ShoppingListItem, Review
 
 
 class ModelListSerializer(serializers.ListSerializer):
@@ -79,9 +79,40 @@ class InstructionSerializer(serializers.ModelSerializer):
         return Instruction.objects.create(recipe=kwargs.get('recipe'), **validated_data)
 
 
+class ReviewSerializer(serializers.ModelSerializer):
+    username = serializers.SerializerMethodField()
+    date_created = serializers.SerializerMethodField()
+
+    class Meta:
+        list_serializer_class = ModelListSerializer
+        model = Review
+        fields = (
+            'id',
+            'username',
+            'rating',
+            'text',
+            'likes',
+            'dislikes',
+            'date_created',
+        )
+
+    def get_username(self, obj):
+        return obj.account.username
+
+    def get_date_created(self, obj):
+        return obj.date_created.strftime("%b %d, %Y")
+
+    def validate(self, data):
+        if data['rating'] not in (1, 6):
+            raise serializers.ValidationError("Ratting is not in range 1-5")
+
+        return data
+
+
 class RecipeSerializer(serializers.ModelSerializer):
     ingredients = IngredientSerializer(many=True)
     instructions = InstructionSerializer(many=True)
+    reviews = ReviewSerializer(many=True)
     tags = serializers.SerializerMethodField()
     rating = serializers.SerializerMethodField()
     username = serializers.SerializerMethodField()
