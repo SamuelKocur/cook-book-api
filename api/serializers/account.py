@@ -16,6 +16,7 @@ class RegisterSerializer(serializers.ModelSerializer):
             'first_name',
             'last_name',
             'email',
+            'username',
             'password1',
             'password2',
         )
@@ -31,7 +32,8 @@ class RegisterSerializer(serializers.ModelSerializer):
             first_name=validated_data['first_name'],
             last_name=validated_data['last_name'],
             email=validated_data['email'],
-            password=validated_data['password1']
+            username=validated_data['username'],
+            password=validated_data['password1'],
         )
 
         return account

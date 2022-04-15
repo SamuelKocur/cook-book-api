@@ -5,7 +5,7 @@ from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from api.models import Recipe, Ingredient
+from api.models import Recipe, Review
 from api.serializers.recipe import RecipeSerializer
 from api.service.recipe import filter_recipes
 
@@ -16,15 +16,19 @@ class RecipeListView(APIView):
     """
 
     def get(self, request):
-        recipes = Recipe.objects.order_by('date_created', 'likes')
-        serializer = RecipeSerializer(recipes, many=True)
-        return Response(serializer.data)
+        account_id = request.query_params.get("account-id")
+        recipes = Recipe.objects.all()[:20]
+        serializer = RecipeSerializer(recipes, many=True, context={'account_id': account_id})
+        recipes = {"recipes": serializer.data}
+        return Response(recipes)
 
     def post(self, request, **kwargs):
         serializer = RecipeSerializer(data=request.data)
+
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -34,8 +38,9 @@ class RecipeDetailView(APIView):
     """
 
     def get(self, request, recipe_id):
+        account_id = request.query_params.get("account-id")
         recipe = get_object_or_404(Recipe, pk=recipe_id)
-        serializer = RecipeSerializer(recipe)
+        serializer = RecipeSerializer(recipe, context={'account_id': account_id})
         return Response(serializer.data)
 
     def put(self, request, recipe_id):
@@ -52,32 +57,23 @@ class RecipeDetailView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class FavoriteRecipeListView(APIView):
-    """
-    Retrieve account' favorite recipes
-    """
-
-    def get(self, request, account_id):
-        pass
-
-
 class RecipeFilterListView(APIView):
     """
-    Retrieve filtered recipe - by category, by ingredients
+    Retrieve filtered recipe
+    User can filer recipes by:
+    1. ingredients
+    2. author
+    3. title
+    4. rating
+    5. tags
+    6. time
     """
 
-    def get(self, request):
+    def post(self, request):
+        account_id = request.query_params.get("account-id")
         body_unicode = request.body.decode('utf-8')
         body = json.loads(body_unicode)
-
-        recipes = filter_recipes(body)
-        serializer = RecipeSerializer(recipes, many=True)
-        return Response(serializer.data)
-
-
-class CommentRecipeView(APIView):
-    pass
-
-
-class LikeRecipeView(APIView):
-    pass
+        recipes = filter_recipes(body)[:20]
+        serializer = RecipeSerializer(recipes, many=True, context={'account_id': account_id})
+        recipes = {"recipes": serializer.data}
+        return Response(recipes)

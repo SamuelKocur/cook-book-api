@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from api.models import Direction, Ingredient, Recipe
+from api.models import Instruction, Ingredient, Recipe, AccountFavoriteRecipe, ShoppingListItem
 
 
 class ModelListSerializer(serializers.ListSerializer):
@@ -37,6 +37,7 @@ class ModelListSerializer(serializers.ListSerializer):
 class IngredientSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(required=False)
     note = serializers.CharField(required=False, allow_blank=True)
+    inShoppingList = serializers.SerializerMethodField()
 
     class Meta:
         list_serializer_class = ModelListSerializer
@@ -47,36 +48,72 @@ class IngredientSerializer(serializers.ModelSerializer):
             'amount',
             'unit',
             'note',
+            'inShoppingList',
         )
+
+    def get_inShoppingList(self, obj):
+        account_id = self.context.get("account_id")
+        if account_id:
+            try:
+                ShoppingListItem.objects.get(account_id=account_id, ingredient_id=obj.id)
+            except ShoppingListItem.DoesNotExist:
+                return False
+
+            return True
+        return False
 
     def create(self, validated_data, **kwargs):
         return Ingredient.objects.create(recipe=kwargs.get('recipe'), **validated_data)
 
 
-class DirectionSerializer(serializers.ModelSerializer):
+class InstructionSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(required=False)
     order = serializers.IntegerField(required=False)
 
     class Meta:
         list_serializer_class = ModelListSerializer
-        model = Direction
-        fields = ('id', 'order', 'direction')
+        model = Instruction
+        fields = ('id', 'order', 'instruction')
 
     def create(self, validated_data, **kwargs):
-        return Direction.objects.create(recipe=kwargs.get('recipe'), **validated_data)
+        return Instruction.objects.create(recipe=kwargs.get('recipe'), **validated_data)
 
 
 class RecipeSerializer(serializers.ModelSerializer):
     ingredients = IngredientSerializer(many=True)
-    directions = DirectionSerializer(many=True)
+    instructions = InstructionSerializer(many=True)
+    tags = serializers.SerializerMethodField()
+    rating = serializers.SerializerMethodField()
+    username = serializers.SerializerMethodField()
+    liked = serializers.SerializerMethodField()
 
     class Meta:
         model = Recipe
         fields = '__all__'
 
+    def get_tags(self, obj):
+        return obj.tags
+
+    def get_rating(self, obj):
+        return obj.rating
+
+    def get_username(self, obj):
+        return obj.account.username
+
+    def get_liked(self, obj):
+        account_id = self.context.get("account_id")
+        if account_id:
+            try:
+                AccountFavoriteRecipe.objects.get(account_id=account_id, recipe_id=obj.id)
+            except AccountFavoriteRecipe.DoesNotExist:
+                return False
+
+            return True
+        return False
+
     def create(self, validated_data):
         ingredients_data = validated_data.pop('ingredients')
-        directions_data = validated_data.pop('directions')
+        directions_data = validated_data.pop('instructions')
 
         recipe = Recipe.objects.create(**validated_data)
 
@@ -84,7 +121,7 @@ class RecipeSerializer(serializers.ModelSerializer):
             Ingredient.objects.create(recipe=recipe, **ingredient_data)
 
         for direction_data in directions_data:
-            Direction.objects.create(recipe=recipe, **direction_data)
+            Instruction.objects.create(recipe=recipe, **direction_data)
 
         return recipe
 

@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from api.models import Account, Direction, Ingredient, Recipe
+from api.models import Account, Instruction, AccountFavoriteRecipe, Ingredient, Recipe, ShoppingListItem
 
 
 class IngredientInlineAdmin(admin.TabularInline):
@@ -9,7 +9,7 @@ class IngredientInlineAdmin(admin.TabularInline):
 
 
 class DirectionInlineAdmin(admin.TabularInline):
-    model = Direction
+    model = Instruction
     extra = 1
 
 
@@ -22,3 +22,5 @@ class RecipeAdmin(admin.ModelAdmin):
 admin.site.register(Account)
 admin.site.register(Recipe, RecipeAdmin)
 admin.site.register(Ingredient)
+admin.site.register(AccountFavoriteRecipe)
+admin.site.register(ShoppingListItem)

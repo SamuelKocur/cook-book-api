@@ -36,7 +36,7 @@ class SignInView(APIView):
             return Response(content, status.HTTP_400_BAD_REQUEST)
 
         if account.password == data['password']:
-            content = {"id": account.id, "email": account.email}
+            content = {"id": account.id, "email": account.email, "username": account.username}
             return Response(content, status.HTTP_200_OK)
 
         content = {"error": "Password is incorrect"}
