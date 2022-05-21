@@ -41,3 +41,14 @@ class SignInView(APIView):
 
         content = {"error": "Password is incorrect"}
         return Response(content, status.HTTP_401_UNAUTHORIZED)
+
+
+class DeleteAccountView(APIView):
+    """
+    Delete user's account
+    """
+    def delete(self, request, user_id):
+        account = get_object_or_404(Account, pk=user_id)
+        account.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+

@@ -37,7 +37,7 @@ class ModelListSerializer(serializers.ListSerializer):
 class IngredientSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(required=False)
     note = serializers.CharField(required=False, allow_blank=True)
-    inShoppingList = serializers.SerializerMethodField()
+    in_shopping_list = serializers.SerializerMethodField()
 
     class Meta:
         list_serializer_class = ModelListSerializer
@@ -48,10 +48,10 @@ class IngredientSerializer(serializers.ModelSerializer):
             'amount',
             'unit',
             'note',
-            'inShoppingList',
+            'in_shopping_list',
         )
 
-    def get_inShoppingList(self, obj):
+    def get_in_shopping_list(self, obj):
         account_id = self.context.get("account_id")
         if account_id:
             try:

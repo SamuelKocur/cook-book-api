@@ -53,7 +53,7 @@ def filter_recipes(request):
 def filter_recipe_by_ingredients(recipes, ingredients):
     if len(recipes) == 0:
         # check for recipes which contains first ingredient
-        recipes = Recipe.objects.filter(ingredients__name__contains=ingredients[0])
+        recipes = set(Recipe.objects.filter(ingredients__name__contains=ingredients[0]))
 
     recipes_final = []
 

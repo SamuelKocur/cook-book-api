@@ -7,20 +7,12 @@ from api.models import Account, Ingredient, ShoppingListItem
 from api.serializers.shopping_list import ShoppingListItemSerializer
 
 
-class ShoppingListView(APIView):
+class ShoppingListIngredientView(APIView):
     """
-    Add, remove, get shopping list
+    Add, remove item to/from shopping list
+
+    Possible to add and remove ingredients from recipes
     """
-
-    def get(self, request):
-        account_id = request.query_params.get("account-id", "")
-        account = get_object_or_404(Account, pk=account_id)
-
-        shopping_list_items = account.shopping_list.all()
-        serializer = ShoppingListItemSerializer(shopping_list_items, many=True)
-        ingredients = {"shoppingListItems": serializer.data}
-        return Response(ingredients)
-
     def post(self, request):
         account_id = request.query_params.get("account-id")
         ingredient_id = request.query_params.get("ingredient-id")
@@ -46,7 +38,20 @@ class ShoppingListView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class ShoppingListUserItemView(APIView):
+class ShoppingListUserItemListView(APIView):
+    """
+    Add item to shopping list
+    Get shopping list
+    Delete all items
+    """
+    def get(self, request):
+        account_id = request.query_params.get("account-id", "")
+        account = get_object_or_404(Account, pk=account_id)
+
+        shopping_list_items = account.shopping_list.all()
+        serializer = ShoppingListItemSerializer(shopping_list_items, many=True)
+        ingredients = {"shoppingListItems": serializer.data}
+        return Response(ingredients)
 
     def post(self, request):
         account_id = request.query_params.get("account-id")
@@ -65,11 +70,23 @@ class ShoppingListUserItemView(APIView):
 
     def delete(self, request):
         account_id = request.query_params.get("account-id", "")
-        item_id = request.query_params.get("item-id", "")
 
         try:
-            shopping_list_item = ShoppingListItem.objects.get(account_id=account_id, pk=item_id)
-            shopping_list_item.delete()
+            ShoppingListItem.objects.filter(account_id=account_id).delete()
+        except ShoppingListItem.DoesNotExist:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class ShoppingListUserItemDetailView(APIView):
+    """
+    Delete item from user shopping list by item_id
+    """
+    def delete(self, request, item_id):
+        account_id = request.query_params.get("account-id", "")
+
+        try:
+            ShoppingListItem.objects.get(account_id=account_id, pk=item_id).delete()
         except ShoppingListItem.DoesNotExist:
             return Response(status=status.HTTP_400_BAD_REQUEST)
         return Response(status=status.HTTP_204_NO_CONTENT)

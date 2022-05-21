@@ -5,8 +5,8 @@ class Ingredient(models.Model):
     recipe = models.ForeignKey(
         "Recipe", on_delete=models.CASCADE, related_name="ingredients"
     )
-    name = models.CharField(max_length=128)
-    amount = models.CharField(max_length=20, null=True)
+    name = models.CharField(max_length=120)
+    amount = models.CharField(max_length=50, null=True)
     unit = models.CharField(max_length=16, null=True, blank=True)
     note = models.TextField(blank=True)
 
@@ -139,3 +139,6 @@ class AccountFavoriteRecipe(models.Model):
     class Meta:
         unique_together = ('account', 'recipe',)
         ordering = ['-date_added']
+
+    def __str__(self):
+        return f"{self.account.username} ({self.recipe.title})"
